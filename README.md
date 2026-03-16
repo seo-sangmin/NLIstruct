@@ -1,4 +1,4 @@
-***This repo is being modularized and corrected based on the ipynb.***
+* ***This repo is being modularized and corrected based on the original python notebook.***
 
 # Identifying Argument Structure in John Searle's Texts Using NLI
 
