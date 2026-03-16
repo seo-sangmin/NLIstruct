@@ -1,6 +1,6 @@
-# Identifying Argument Structure in John Searle's Texts Using NLI
+***This repo is being modularized and corrected based on the ipynb.
 
-Authored by: Sangmin Seo
+# Identifying Argument Structure in John Searle's Texts Using NLI
 
 This project analyzes the argument structure of John Searle's Chinese Room Argument using Natural Language Processing (NLP) techniques and Natural Language Inference (NLI). It examines two source texts:
 
