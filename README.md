@@ -20,7 +20,7 @@ The analysis proceeds in four stages:
 
 ```
 NLIstruct/
-├── main.py              # Run the full analysis pipeline
+├── main.py              # Run the full pipeline or individual sections
 ├── preprocessing.py     # Download, clean, and tokenize source texts
 ├── exploratory.py       # Word statistics and word cloud visualization
 ├── topic_modeling.py    # LDA topic extraction with word clouds
@@ -56,9 +56,22 @@ python main.py
 
 This executes all stages sequentially: text preprocessing, exploratory analysis, topic modeling, sentence embedding, summarization, BERT fine-tuning, NLI argument analysis, and the discussion of limits.
 
+### Running Individual Sections
+
+Each major section can be run independently via a command-line argument:
+
+```bash
+python main.py text_analysis   # Section 2: Text preprocessing, exploratory analysis, topic modeling, embedding, summarization
+python main.py fine_tuning     # Section 3.1: Fine-tune BERT on SNLI
+python main.py nli_analysis    # Section 3.2: NLI argument analysis with CrossEncoder
+python main.py discussion      # Section 4: Limits & discussion (auto-runs text_analysis and nli_analysis first)
+```
+
+`text_analysis`, `fine_tuning`, and `nli_analysis` are fully independent and can run in any order. `discussion` depends on results from `text_analysis` and `nli_analysis`, so it runs those automatically.
+
 ### Using Individual Modules
 
-Each module can be imported independently:
+Each module can also be imported independently in Python:
 
 ```python
 from preprocessing import load_cra, load_mbp
