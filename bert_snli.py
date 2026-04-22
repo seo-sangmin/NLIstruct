@@ -63,17 +63,20 @@ def load_pretrained_bert(
 
 
 def get_devices():
-    """Get available computation devices (GPUs or CPU fallback).
+    """Get available computation devices (CUDA, MPS, or CPU fallback).
 
     Returns:
-        list: List of device strings.
+        list: List of torch.device objects.
     """
-    available_gpus = d2l.try_all_gpus()
-    if len(available_gpus) == 0:
-        print("No GPUs found, using CPU.")
-        return ["cpu"]
-    print(f"Using GPU: {available_gpus}")
-    return available_gpus
+    if torch.cuda.is_available():
+        devices = [torch.device(f"cuda:{i}") for i in range(torch.cuda.device_count())]
+        print(f"Using CUDA GPU(s): {devices}")
+        return devices
+    if torch.backends.mps.is_available():
+        print("Using Apple Silicon GPU (MPS).")
+        return [torch.device("mps")]
+    print("No GPU found, using CPU.")
+    return [torch.device("cpu")]
 
 
 class SNLIBERTDataset(torch.utils.data.Dataset):
@@ -233,9 +236,13 @@ def train_classifier(bert_model, devices, learning_rate=1e-4, epochs=6):
     optimizer = torch.optim.Adam(classifier.parameters(), lr=learning_rate)
     loss_fn = nn.CrossEntropyLoss(reduction="none")
 
-    # Warm up the model with a single batch
+    # Warm up the model with a single batch (runs on CPU to initialise LazyLinear)
     classifier(next(iter(train_loader))[0])
-    net = nn.DataParallel(classifier, device_ids=devices).to(devices[0])
+    device = devices[0]
+    if device.type == "cuda" and len(devices) > 1:
+        net = nn.DataParallel(classifier, device_ids=list(range(len(devices)))).to(device)
+    else:
+        net = classifier.to(device)
 
     num_batches = len(train_loader)
     total_batches = num_batches * epochs
@@ -248,10 +255,10 @@ def train_classifier(bert_model, devices, learning_rate=1e-4, epochs=6):
 
         for i, (features, labels) in enumerate(train_loader):
             if isinstance(features, list):
-                features = [x.to(devices[0]) for x in features]
+                features = [x.to(device) for x in features]
             else:
-                features = features.to(devices[0])
-            labels = labels.to(devices[0])
+                features = features.to(device)
+            labels = labels.to(device)
 
             optimizer.zero_grad()
             preds = net(features)
@@ -276,7 +283,7 @@ def train_classifier(bert_model, devices, learning_rate=1e-4, epochs=6):
                 flush=True,
             )
 
-        test_acc = _evaluate_accuracy(net, test_loader, devices[0])
+        test_acc = _evaluate_accuracy(net, test_loader, device)
         print(
             f"\nEpoch {epoch + 1} done — "
             f"train_loss={running_loss / running_seen:.4f} "
