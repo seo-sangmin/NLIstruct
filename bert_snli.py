@@ -203,6 +203,23 @@ def prepare_snli_data(vocabulary, batch_size=256, max_sequence_length=128):
     return train_loader, test_loader
 
 
+def _evaluate_accuracy(net, data_loader, device):
+    """Compute classification accuracy of ``net`` over ``data_loader``."""
+    net.eval()
+    correct, total = 0, 0
+    with torch.no_grad():
+        for features, labels in data_loader:
+            if isinstance(features, list):
+                features = [x.to(device) for x in features]
+            else:
+                features = features.to(device)
+            labels = labels.to(device)
+            preds = net(features)
+            correct += (preds.argmax(dim=1) == labels).sum().item()
+            total += labels.numel()
+    return correct / total
+
+
 def train_classifier(bert_model, devices, learning_rate=1e-4, epochs=6):
     """Fine-tune BERT on SNLI and report training time.
 
@@ -218,9 +235,56 @@ def train_classifier(bert_model, devices, learning_rate=1e-4, epochs=6):
 
     # Warm up the model with a single batch
     classifier(next(iter(train_loader))[0])
+    net = nn.DataParallel(classifier, device_ids=devices).to(devices[0])
 
+    num_batches = len(train_loader)
+    total_batches = num_batches * epochs
     start_time = time.time()
-    d2l.train_ch13(classifier, train_loader, test_loader, loss_fn, optimizer, epochs, devices)
+
+    for epoch in range(epochs):
+        epoch_start = time.time()
+        running_loss, running_correct, running_seen = 0.0, 0, 0
+        net.train()
+
+        for i, (features, labels) in enumerate(train_loader):
+            if isinstance(features, list):
+                features = [x.to(devices[0]) for x in features]
+            else:
+                features = features.to(devices[0])
+            labels = labels.to(devices[0])
+
+            optimizer.zero_grad()
+            preds = net(features)
+            loss = loss_fn(preds, labels)
+            loss.sum().backward()
+            optimizer.step()
+
+            running_loss += loss.sum().item()
+            running_correct += (preds.argmax(dim=1) == labels).sum().item()
+            running_seen += labels.numel()
+
+            done = epoch * num_batches + i + 1
+            elapsed = time.time() - start_time
+            eta = elapsed * (total_batches - done) / done
+            print(
+                f"\rEpoch {epoch + 1}/{epochs} "
+                f"batch {i + 1}/{num_batches} "
+                f"loss={running_loss / running_seen:.4f} "
+                f"acc={running_correct / running_seen:.4f} "
+                f"elapsed={elapsed / 60:.1f}m ETA={eta / 60:.1f}m",
+                end="",
+                flush=True,
+            )
+
+        test_acc = _evaluate_accuracy(net, test_loader, devices[0])
+        print(
+            f"\nEpoch {epoch + 1} done — "
+            f"train_loss={running_loss / running_seen:.4f} "
+            f"train_acc={running_correct / running_seen:.4f} "
+            f"test_acc={test_acc:.4f} "
+            f"({(time.time() - epoch_start) / 60:.2f}m)"
+        )
+
     elapsed_minutes = (time.time() - start_time) / 60
 
     print(f"Training took: {elapsed_minutes:.2f} minutes")
