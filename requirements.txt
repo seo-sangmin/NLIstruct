@@ -7,7 +7,7 @@ sentence-transformers
 plotly
 torch
 transformers
-d2l
 pandas
 numpy
 scipy
+d2l==1.0.3
