@@ -1,14 +1,21 @@
-gdown
-nltk
-wordcloud
-matplotlib
-scikit-learn
-sentence-transformers
-plotly
-torch
-transformers
+# Pinned to the latest versions available on or before 2023-09-22, the date
+# the original notebook (Identifying Argument Structure.ipynb) last ran
+# successfully. d2l==1.0.3 itself pins numpy, scipy, matplotlib,
+# matplotlib-inline, pandas, requests, and jupyter; those pins are repeated
+# below for transparency. huggingface-hub is pinned because
+# sentence-transformers 2.2.2 imports cached_download, which was removed in
+# huggingface-hub 0.20+ (Dec 2023).
+gdown==4.7.1
+nltk==3.8.1
+wordcloud==1.9.2
+matplotlib==3.7.2
+scikit-learn==1.3.1
+sentence-transformers==2.2.2
+huggingface-hub==0.17.2
+plotly==5.17.0
+torch==2.0.1
+transformers==4.33.2
 d2l==1.0.3
-pandas
-numpy
-scipy
-
+pandas==2.0.3
+numpy==1.23.5
+scipy==1.10.1
