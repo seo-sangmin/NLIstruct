@@ -4,11 +4,11 @@ wordcloud
 matplotlib
 scikit-learn
 sentence-transformers
+sentencepiece
 huggingface-hub
 plotly
 torch
 transformers
-d2l == 1.0.3
 pandas
 numpy
 scipy
