@@ -1,19 +1,17 @@
-"""
-gdown==5.2.2
-nltk==3.9.1
-wordcloud==1.9.6
-matplotlib==3.10.0
-scikit-learn==1.6.1
-sentence-transformers==5.4.1
-sentencepiece==0.2.1
-huggingface_hub==1.11.0
-plotly==5.24.1
-torch==2.10.0+cu128
-transformers==5.0.0
-pandas==2.2.2
-numpy==2.0.2
-scipy==1.16.3
-"""
+# gdown==5.2.2
+# nltk==3.9.1
+# wordcloud==1.9.6
+# matplotlib==3.10.0
+# scikit-learn==1.6.1
+# sentence-transformers==5.4.1
+# sentencepiece==0.2.1
+# huggingface_hub==1.11.0
+# plotly==5.24.1
+# torch==2.10.0+cu128
+# transformers==5.0.0
+# pandas==2.2.2
+# numpy==2.0.2
+# scipy==1.16.3
 
 # Requirements locked from Google Colab notebook (May 03, 2026)
 absl-py==1.4.0
