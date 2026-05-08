@@ -20,18 +20,21 @@ The analysis proceeds in four stages:
 
 ```
 NLIstruct/
-├── main.py              # Run the full pipeline or individual sections
-├── preprocessing.py     # Download, clean, and tokenize source texts
-├── exploratory.py       # Word statistics and word cloud visualization
-├── topic_modeling.py    # LDA topic extraction with word clouds
-├── embedding.py         # Sentence embedding and t-SNE visualization
-├── summarization.py     # Text summarization using LongT5
-├── bert_snli.py         # BERT fine-tuning on SNLI
-├── nli_analysis.py      # NLI prediction and argument analysis
-├── discussion.py        # Limits and discussion demonstrations
-├── requirements.txt     # Python dependencies
-└── Identifying Argument Structure.ipynb  # Original notebook
+├── main.ipynb                 # Colab-ready notebook running the full pipeline
+├── preprocessing.py           # Download, clean, and tokenize source texts
+├── exploratory.py             # Word statistics and word cloud visualization
+├── topic_modeling.py          # LDA topic extraction with word clouds
+├── embedding.py               # Sentence embedding and t-SNE visualization
+├── summarization.py           # Text summarization using LongT5
+├── bert_snli.py               # BERT fine-tuning on SNLI
+├── nli_analysis.py            # NLI prediction and argument analysis
+├── discussion.py              # Limits and discussion demonstrations
+├── requirements.txt           # Python dependencies
+└── original_notebook/
+    └── Identifying Argument Structure.ipynb  # Original Sep 2023 notebook
 ```
+
+The `original_notebook/` folder preserves the unmodified notebook from September 2023 for reference. The active pipeline lives in `main.ipynb` and the modular `*.py` files at the repository root.
 
 ## Setup
 
@@ -48,26 +51,11 @@ pip install -r requirements.txt
 
 ## Usage
 
-Run the full pipeline:
+### Running the Notebook
 
-```bash
-python main.py
-```
+The recommended way to run the full pipeline is via `main.ipynb`, which is designed for Google Colab with a T4 GPU runtime. Open it in Colab (or a local Jupyter environment with GPU access) and execute the cells in order. The setup cells clone this repository, install dependencies, verify CUDA, and download NLTK corpora before the pipeline runs.
 
-This executes all stages sequentially: text preprocessing, exploratory analysis, topic modeling, sentence embedding, summarization, BERT fine-tuning, NLI argument analysis, and the discussion of limits.
-
-### Running Individual Sections
-
-Each major section can be run independently via a command-line argument:
-
-```bash
-python main.py text_analysis   # Section 2: Text preprocessing, exploratory analysis, topic modeling, embedding, summarization
-python main.py fine_tuning     # Section 3.1: Fine-tune BERT on SNLI
-python main.py nli_analysis    # Section 3.2: NLI argument analysis with CrossEncoder
-python main.py discussion      # Section 4: Limits & discussion (auto-runs text_analysis and nli_analysis first)
-```
-
-`text_analysis`, `fine_tuning`, and `nli_analysis` are fully independent and can run in any order. `discussion` depends on results from `text_analysis` and `nli_analysis`, so it runs those automatically.
+In Colab: **Runtime → Change runtime type → T4 GPU → Save**, then run all cells.
 
 ### Using Individual Modules
 
@@ -84,6 +72,8 @@ cra_raw, cra_clean, cra_tokens = load_cra()
 model = load_nli_model()
 label, scores = predict_nli(model, "Syntax is formal.", "Minds are semantic.")
 ```
+
+The modules are organized so that text analysis (`preprocessing`, `exploratory`, `topic_modeling`, `embedding`, `summarization`), BERT fine-tuning (`bert_snli`), and NLI argument analysis (`nli_analysis`) are independent. The `discussion` module depends on outputs from text analysis and NLI argument analysis.
 
 ## Key Dependencies
 
