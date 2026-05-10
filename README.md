@@ -19,7 +19,7 @@ The analysis proceeds in four stages:
 ## Project Structure
 
 ```
-NLIstruct/
+nli-argument-structure/
 ├── main.ipynb                 # Colab-ready notebook running the full pipeline
 ├── preprocessing.py           # Download, clean, and tokenize source texts
 ├── exploratory.py             # Word statistics and word cloud visualization
